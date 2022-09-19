@@ -20,12 +20,20 @@ const Box = styled(motion.div)`
 const BoxVariants = {
   start: { scale: 0 },
   end: { scale: 2, rotateZ: 180, transition: { duration: 1 } },
+  hover: { borderRadius: "50%", backgroundColor: "rgb(0,0,0,0.5)" },
+  click: { scale: 0.5, backgroundColor: "rgb(255,255,255)" },
 };
 
 function App() {
   return (
     <Wrapper>
-      <Box variants={BoxVariants} initial="start" animate="end" />
+      <Box
+        variants={BoxVariants}
+        initial="start"
+        animate="end"
+        whileHover="hover"
+        whileTap="click"
+      />
     </Wrapper>
   );
 }
