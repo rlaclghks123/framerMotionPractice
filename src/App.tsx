@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
-import { useRef } from "react";
+import { motion, useMotionValue, useTransform, useScroll } from "framer-motion";
+import { useEffect } from "react";
 
-const Wrapper = styled.div`
-  height: 100vh;
+const Wrapper = styled(motion.div)`
+  height: 200vh;
   width: 100vw;
   display: flex;
   justify-content: center;
@@ -29,29 +29,36 @@ const Box = styled(motion.div)`
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
-const BoxVariants = {
-  start: { scale: 0 },
-  end: { scale: 2, rotateZ: 180, transition: { duration: 1 } },
-  hover: { borderRadius: "50%", backgroundColor: "rgb(0,0,0,0.5)" },
-  click: { scale: 1, backgroundColor: "rgb(255,255,255)" },
-};
-
 function App() {
-  const boxRef = useRef(null);
+  const x = useMotionValue(0);
+  // useTransForm Hook 사용
+  const rotateZ = useTransform(x, [-300, 300], [-360, 360]);
+  const gradient = useTransform(
+    x,
+    [-300, 0, 300],
+    [
+      "linear-gradient(135deg, rgb(0, 210, 238), rgb(0, 83, 238))",
+      "linear-gradient(135deg, rgb(238, 0, 153), rgb(221, 0, 238))",
+      "linear-gradient(135deg, rgb(0, 238, 155), rgb(238, 178, 0))",
+    ]
+  );
+  const { scrollYProgress } = useScroll();
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 5]);
+  //motionValue값을 확인하기 위해 useEffect를 사용
+  useEffect(() => {
+    x.onChange(() => {
+      console.log(x.get());
+    });
+  }, [x]);
 
   return (
-    <Wrapper>
-      <BiggerBox ref={boxRef}>
+    <Wrapper style={{ background: gradient }}>
+      <BiggerBox>
         <Box
-          drag
+          style={{ x, rotateZ, scale }}
+          drag="x"
           dragSnapToOrigin
-          dragConstraints={boxRef}
           dragElastic={0.2}
-          variants={BoxVariants}
-          initial="start"
-          animate="end"
-          whileHover="hover"
-          whileTap="click"
         />
       </BiggerBox>
     </Wrapper>
