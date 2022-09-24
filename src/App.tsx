@@ -8,6 +8,8 @@ const Wrapper = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Box = styled(motion.div)`
@@ -15,36 +17,65 @@ const Box = styled(motion.div)`
   height: 200px;
   border-radius: 20px;
   background-color: white;
-  position: fixed;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   top: 100px;
+  position: absolute;
 `;
 
-const BoxVariant = {
-  initial: { opacity: 0, scale: 0 },
-  visible: { opacity: 1, scale: 1, rotateZ: 360 },
-  leaving: { opacity: 0, y: 20, scale: 0 },
+const BoxVar = {
+  entry: (isBack: boolean) => ({
+    x: isBack ? -500 : 500,
+    scale: 0,
+    opacity: 0,
+  }),
+
+  visible: {
+    x: 0,
+    scale: 1,
+    opacity: 1,
+    transition: { duration: 1 },
+  },
+  exit: (isBack: boolean) => ({
+    x: isBack ? 500 : -500,
+    scale: 0,
+    opacity: 0,
+    transition: { duration: 1 },
+  }),
 };
 
 function App() {
-  const [clicked, setClicked] = useState(false);
+  const [visible, setVisible] = useState(0);
+  const [isBack, setBack] = useState(false);
 
-  const toggle = () => {
-    setClicked(prev => !prev);
+  const nextBtn = () => {
+    setBack(false);
+    setVisible(prev => (prev === 10 ? 1 : prev + 1));
+  };
+
+  const prevBtn = () => {
+    setBack(true);
+    setVisible(prev => (prev === 1 ? 10 : prev - 1));
   };
 
   return (
     <Wrapper>
-      <AnimatePresence>
-        {clicked ? (
-          <Box
-            variants={BoxVariant}
-            initial="initial"
-            animate="visible"
-            exit="leaving"
-          />
-        ) : null}
+      <AnimatePresence custom={isBack}>
+        <Box
+          key={visible}
+          variants={BoxVar}
+          initial="entry"
+          animate="visible"
+          exit="exit"
+          custom={isBack}
+        >
+          {visible}
+        </Box>
       </AnimatePresence>
-      <button onClick={toggle}>click</button>
+      <button onClick={nextBtn}>next</button>
+      <button onClick={prevBtn}>prev</button>
     </Wrapper>
   );
 }
